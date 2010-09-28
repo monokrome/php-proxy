@@ -46,7 +46,7 @@
 		$request_headers = Array();
 
 	$curl_opts = Array(
-		CURALOPT_AUTOREFERRER => true,
+		CURLOPT_AUTOREFERRER => true,
 		CURLOPT_HEADER => true,
 		CURLOPT_HTTPHEADER => $request_headers,
 		CURLOPT_FORBID_REUSE => true,
@@ -59,7 +59,7 @@
 	);
 
 	$curl_descriptor = curl_init($server_url);
-	curl_setopt_array($curl_descriptor, $curl_opts);
+	var_dump(curl_setopt_array($curl_descriptor, $curl_opts)); die('TEST');
 
 	$response = curl_exec($curl_descriptor);
 
