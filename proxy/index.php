@@ -61,7 +61,7 @@
 	$curl_descriptor = curl_init($server_url);
 	curl_setopt_array($curl_descriptor,	$curl_opts);
 
-	$success = curl_exec($curl_descriptor);
+	$response = curl_exec($curl_descriptor);
 
 	if ($success === false)
 		exit(CURL_EXEC_FAILURE);
