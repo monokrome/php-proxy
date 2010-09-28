@@ -59,7 +59,7 @@
 	);
 
 	$curl_descriptor = curl_init($server_url);
-	curl_setopt_array($curl_descriptor,	$curl_opts);
+	curl_setopt_array($curl_descriptor, $curl_opts);
 
 	$response = curl_exec($curl_descriptor);
 
