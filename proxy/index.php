@@ -40,7 +40,7 @@
 	// Spoof the referrer so that this doesn't behave as an "anonymous" proxy
 	if (isset($_SERVER['HTTP_REFERER']))
 		$request_headers = Array(
-			'X-Forward-For: ' . $_SERVER['HTTP_REFERRER'],
+			'X-Forward-For: ' . $_SERVER['HTTP_REFERER'],
 		);
 	else
 		$request_headers = Array();
