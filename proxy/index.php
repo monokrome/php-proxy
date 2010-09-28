@@ -46,7 +46,7 @@
 		$request_headers = Array();
 
 	$curl_opts = Array(
-		CURLOPT_AUTOREFERRER => true,
+		CURLOPT_AUTOREFERER => true,
 		CURLOPT_HEADER => true,
 		CURLOPT_HTTPHEADER => $request_headers,
 		CURLOPT_FORBID_REUSE => true,
