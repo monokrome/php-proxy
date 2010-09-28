@@ -40,13 +40,13 @@
 	// Spoof the referrer so that this doesn't behave as an "anonymous" proxy
 	if (isset($_SERVER['HTTP_REFERER']))
 		$request_headers = Array(
-			'Referrer: ' . $_SERVER['HTTP_REFERRER'],
+			'X-Forward-For: ' . $_SERVER['HTTP_REFERRER'],
 		);
 	else
 		$request_headers = Array();
 
 	$curl_opts = Array(
-		CURALOPT_AUTOREFERRER => false, // We're trying to maintain the original referrer to keep from becoming an anonymous proxy.
+		CURALOPT_AUTOREFERRER => true,
 		CURLOPT_HEADER => true,
 		CURLOPT_HTTPHEADER => $request_headers,
 		CURLOPT_FORBID_REUSE => true,
