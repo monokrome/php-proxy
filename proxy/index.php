@@ -110,19 +110,7 @@
 	// Place the received headers into an array and remove the original HTTP header
 	$headers = explode("\n", substr($response, 0, $header_size));
 
-	// TODO: Make this a bit less insane/obstrusive
-	foreach ($headers as $header)
-	{
-		$matches = Array();
-
-		if (preg_match('/^([^:]+)\:\s*(.+)$/i', $header, $matches))
-		{
-			if (in_array($matches[1], $transferable_headers))
-			{
-				header($header);
-			}
-		}
-	}
+	header($header);
 
 	// Print the final contents retreived from the cURL request, excluding headers
 	print substr($response, $header_size, strlen($response)-$header_size);
