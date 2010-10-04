@@ -56,6 +56,7 @@
 		CURLOPT_SSL_VERIFYPEER => true, // Set to true to set it on older curl versions
 		CURLOPT_UNRESTRICTED_AUTH => false,
 		CURLOPT_SSL_VERIFYHOST => 2,
+		CURLOPT_CUSTOMREQUEST => strtoupper($_SERVER['REQUEST_METHOD']),
 	);
 
 	$curl_descriptor = curl_init($server_url);
@@ -89,4 +90,3 @@
 
 	print substr($response, $header_size, strlen($response)-$header_size);
 ?>
-
