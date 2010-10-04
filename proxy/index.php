@@ -11,13 +11,12 @@
 	// Defines a bunch of errors that this file uses.
 	require_once('errors.php');
 
+	// A standard set of methods for RESTful services.
+	$allowed_request_methods = Array('GET', 'POST', 'PUT', 'DELETE');
+
 	// Check that we are using a supported HTTP method
-	if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST')
-		$server_url = $_POST['destination'] or exit(NO_DESTINATION);
-
-	elseif (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET')
-		$server_url = $_GET['destination'] or exit(NO_DESTINATION);
-
+	if (in_array(strtoupper($_SERVER['REQUEST_METHOD']), $allowed_request_methods))
+		$server_url = $_REQUEST['destination'] or exit(NO_DESTINATION);
 	else
 		exit(HTTP_METHOD_ERROR);
 
@@ -90,3 +89,4 @@
 
 	print substr($response, $header_size, strlen($response)-$header_size);
 ?>
+
