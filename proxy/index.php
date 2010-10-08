@@ -43,7 +43,7 @@
 		if (in_array(strtoupper($_SERVER['REQUEST_METHOD']), $allowed_request_methods))
 
 			if (isset($_REQUEST['destination']))
-				$server_url = $_REQUEST['destination'];
+				$remote_destination = $_REQUEST['destination'];
 			else
 				throw new NoDestinationError();
 
@@ -61,7 +61,7 @@
 
 		// Loop through our expressions searching for a match
 		for ($i=0; $i < count($url_expressions); ++$i)
-		if (preg_match($url_expressions[$i], $server_url))
+		if (preg_match($url_expressions[$i], $remote_destination))
 		{
 			$url_accepted = true;
 			break;
@@ -96,7 +96,7 @@
 		);
 
 		// Initialize cURL, and provide it the options array that we just created.
-		$curl_descriptor = curl_init($server_url);
+		$curl_descriptor = curl_init($remote_destination);
 		curl_setopt_array($curl_descriptor, $curl_opts);
 
 		// Make a request over the cURL descriptor 
