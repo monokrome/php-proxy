@@ -24,7 +24,7 @@
 
 		public function __construct($message = null, $code = 0, Exception $previous = null)
 		{
-			super::__construct($message, $code, $previous);
+			parent::__construct($message, $code, $previous);
 
 			header($this->response);
 		}
@@ -34,7 +34,7 @@
 	class NoDestinationError extends Error
 	{
 			protected $message =
-				'You must provide a "destination" parementer in your HTTP request.';
+				'You must provide a "destination" parameter in your HTTP request.';
 
 			protected $response = 'HTTP/1.1 400 Bad Request';
 	}
