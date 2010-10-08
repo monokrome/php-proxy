@@ -25,9 +25,6 @@
 	 * and in doing so - you are basically asking attackers to have their fun
 	 * on your systems.
 	 *
-	 * I am not liable for any issues that arise from your use of this script. See
-	 * the LICENSE.txt if you need more details.
-	 *
 	 * Simple PHP Proxy; Brandon R. Stoner <monokrome@monokro.me>
 	 */
 
