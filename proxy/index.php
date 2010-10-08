@@ -1,7 +1,5 @@
 <?php
 	/**
-	 * Simple PHP Proxy; Brandon R. Stoner <monokrome@monokro.me>
-	 *
 	 * This is a proxy to be used for requesting data from external APIs
 	 * across domains. This is a secure method of "dodging" the same-origin
 	 * security policy, but you should only use it in the case that you
@@ -29,6 +27,8 @@
 	 *
 	 * I am not liable for any issues that arise from your use of this script. See
 	 * the LICENSE.txt if you need more details.
+	 *
+	 * Simple PHP Proxy; Brandon R. Stoner <monokrome@monokro.me>
 	 */
 
 	try
