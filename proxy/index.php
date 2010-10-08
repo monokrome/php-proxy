@@ -31,87 +31,99 @@
 	 * the LICENSE.txt if you need more details.
 	 */
 
-	// Allows us to see all errors, notice, warnings, and obscurities
-	error_reporting(E_ALL | E_STRICT);
+	try
+	{
+		// Allows us to see all errors, notice, warnings, and obscurities
+		error_reporting(E_ALL | E_STRICT);
 
-	// Defines a bunch of errors that this file uses.
-	require_once('errors.php');
+		// Defines a bunch of errors that this file uses.
+		require_once('errors.php');
 
-	// A standard set of methods for RESTful services.
-	$allowed_request_methods = Array('GET', 'POST', 'PUT', 'DELETE');
+		// A standard set of methods for RESTful services.
+		$allowed_request_methods = Array('GET', 'POST', 'PUT', 'DELETE');
 
-	// Check that we are using a supported HTTP method
-	if (in_array(strtoupper($_SERVER['REQUEST_METHOD']), $allowed_request_methods))
+		// Check that we are using a supported HTTP method
+		if (in_array(strtoupper($_SERVER['REQUEST_METHOD']), $allowed_request_methods))
 
-		if (isset($_REQUEST['destination']))
-			$server_url = $_REQUEST['destination'];
+			if (isset($_REQUEST['destination']))
+				$server_url = $_REQUEST['destination'];
+			else
+				throw new NoDestinationError();
+
 		else
-			throw new NoDestinationError();
+			throw new HTTPMethodError();
 
-	else
-		throw new HTTPMethodError();
+		// Remove this from the request array, because other data will be passed to the proxy.
+		unset($_REQUEST['destination']);
 
-	// Gets the array of useful expressions from expressions.php
-	$transferable_headers = require('headers.php');
-	$url_expressions = require('expressions.php');
+		// Gets the array of useful expressions from expressions.php
+		$transferable_headers = require('headers.php');
+		$url_expressions = require('expressions.php');
 
-	$url_accepted    = false; // Has our URL passed an expression test?
+		$url_accepted = false; // Has our URL passed an expression test?
 
-	// Loop through our expressions searching for a match
-	for ($i=0; $i < count($url_expressions); ++$i)
+		// Loop through our expressions searching for a match
+		for ($i=0; $i < count($url_expressions); ++$i)
 		if (preg_match($url_expressions[$i], $_GET['destination']))
 		{
 			$url_accepted = true;
 			break;
 		}
 
-	// This URL is not trusted, so exit from this process.
-	if ($url_accepted == false)
-		throw new UntrustedURLError();
+		// This URL is not trusted, so exit from this process.
+		if ($url_accepted == false)
+			throw new UntrustedURLError();
 
-	// Since our URL was trusted, make sure the server know this was forwarded
-	if (isset($_SERVER['HTTP_REFERER']))
-		$request_headers = Array(
-			'X-Forward-For: ' . $_SERVER['HTTP_REFERER'],
+		// Since our URL was trusted, make sure the server know this was forwarded
+		if (isset($_SERVER['HTTP_REFERER']))
+			$request_headers = Array(
+				'X-Forward-For: ' . $_SERVER['HTTP_REFERER'],
+			);
+		else
+			$request_headers = Array();
+
+		// Set up a sane set of default options for cURL to request with.
+		$curl_opts = Array(
+			CURLOPT_AUTOREFERER => true,
+			CURLOPT_HEADER => true,
+			CURLOPT_HTTPHEADER => $request_headers,
+			CURLOPT_FORBID_REUSE => true,
+			CURLOPT_FRESH_CONNECT => true, // This is probably a bit redundant with FORBID_REUSE, but better safe than sorry ;)
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_SSL_VERIFYPEER => true, // Set to true to set it on older curl versions
+			CURLOPT_UNRESTRICTED_AUTH => false,
+			CURLOPT_SSL_VERIFYHOST => 2,
+			CURLOPT_CUSTOMREQUEST => strtoupper($_SERVER['REQUEST_METHOD']),
+			CURLOPT_POSTFIELDS => $_REQUEST,
 		);
-	else
-		$request_headers = Array();
 
-	// Set up a sane set of default options for cURL to request with.
-	$curl_opts = Array(
-		CURLOPT_AUTOREFERER => true,
-		CURLOPT_HEADER => true,
-		CURLOPT_HTTPHEADER => $request_headers,
-		CURLOPT_FORBID_REUSE => true,
-		CURLOPT_FRESH_CONNECT => true, // This is probably a bit redundant with FORBID_REUSE, but better safe than sorry ;)
-		CURLOPT_RETURNTRANSFER => true,
-		CURLOPT_FOLLOWLOCATION => true,
-		CURLOPT_SSL_VERIFYPEER => true, // Set to true to set it on older curl versions
-		CURLOPT_UNRESTRICTED_AUTH => false,
-		CURLOPT_SSL_VERIFYHOST => 2,
-		CURLOPT_CUSTOMREQUEST => strtoupper($_SERVER['REQUEST_METHOD']),
-	);
+		// Initialize cURL, and provide it the options array that we just created.
+		$curl_descriptor = curl_init($server_url);
+		curl_setopt_array($curl_descriptor, $curl_opts);
 
-	// Initialize cURL, and provide it the options array that we just created.
-	$curl_descriptor = curl_init($server_url);
-	curl_setopt_array($curl_descriptor, $curl_opts);
+		// Make a request over the cURL descriptor 
+		$response = curl_exec($curl_descriptor);
 
-	// Make a request over the cURL descriptor 
-	$response = curl_exec($curl_descriptor);
+		// When this occurs, cURL failed.
+		if ($response === false)
+			throw new CurlExecFailureError();
 
-	// When this occurs, cURL failed.
-	if ($response === false)
-		throw new CurlExecFailureError();
+		// Get the size of our header, so we know where to split the content from it.
+		$header_size = curl_getinfo($curl_descriptor, CURLINFO_HEADER_SIZE);
+		curl_close  ($curl_descriptor);
 
-	// Get the size of our header, so we know where to split the content from it.
-	$header_size = curl_getinfo($curl_descriptor, CURLINFO_HEADER_SIZE);
-	curl_close  ($curl_descriptor);
+		// Place the received headers into an array and remove the original HTTP header
+		$headers = explode("\n", substr($response, 0, $header_size));
 
-	// Place the received headers into an array and remove the original HTTP header
-	$headers = explode("\n", substr($response, 0, $header_size));
+		header($header);
 
-	header($header);
+		// Print the final contents retreived from the cURL request, excluding headers
+		print substr($response, $header_size, strlen($response)-$header_size);
 
-	// Print the final contents retreived from the cURL request, excluding headers
-	print substr($response, $header_size, strlen($response)-$header_size);
+	}
+	catch (Error $e)
+	{
+		print $e->getMessage();
+	}
 ?>
