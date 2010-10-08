@@ -61,7 +61,7 @@
 
 		// Loop through our expressions searching for a match
 		for ($i=0; $i < count($url_expressions); ++$i)
-		if (preg_match($url_expressions[$i], $_GET['destination']))
+		if (preg_match($url_expressions[$i], $server_url))
 		{
 			$url_accepted = true;
 			break;
