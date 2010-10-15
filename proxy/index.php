@@ -72,12 +72,10 @@
 			throw new UntrustedURLError();
 
 		// Since our URL was trusted, make sure the server know this was forwarded
+		$request_headers = Array();
+
 		if (isset($_SERVER['HTTP_REFERER']))
-			$request_headers = Array(
-				'X-Forward-For: ' . $_SERVER['HTTP_REFERER'],
-			);
-		else
-			$request_headers = Array();
+			array_push($request_headers, 'X-Forward-For: ' . $_SERVER['HTTP_REFERER']);
 
 		// Set up a sane set of default options for cURL to request with.
 		$curl_opts = Array(
