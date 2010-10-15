@@ -71,7 +71,7 @@
 		if ($url_accepted == false)
 			throw new UntrustedURLError();
 
-		// Since our URL was trusted, make sure the server know this was forwarded
+		// Since our URL was trusted, make sure the server knows this was forwarded
 		$request_headers = Array();
 
 		if (isset($_SERVER['HTTP_REFERER']))
