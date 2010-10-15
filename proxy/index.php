@@ -36,7 +36,11 @@
 		// Defines a bunch of errors that this file uses.
 		require_once('errors.php');
 
-		// A standard set of methods for RESTful services.
+		// A almost-standard set of methods for RESTful services.
+		/**
+		 * TODO: Figure out the best way to receive a destination for the
+		 * DELETE method, which wont let you pass data to it.
+		 */
 		$allowed_request_methods = Array('GET', 'POST', 'PUT', 'DELETE');
 
 		// Check that we are using a supported HTTP method
